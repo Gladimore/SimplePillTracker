@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pill Tracker — Morning & Night (Daily Reset)</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0;
+      background: #f6f8fb; color: #111;
+    }
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(15, 20, 30, 0.08);
+      width: 340px; text-align: center;
+    }
+    h1 { font-size: 18px; margin-bottom: 16px; }
+    .pill {
+      border-top: 1px solid #ddd;
+      padding-top: 16px; margin-top: 16px;
+    }
+    .pill:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+    h2 { font-size: 16px; margin: 0 0 8px; }
+    p { margin: 8px 0; color: #444; font-size: 14px; }
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 0;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 4px;
+    }
+    .take { background: #2b8aef; color: white; }
+    .undo { background: #ef5350; color: white; }
+    .rename { background: #e0e0e0; color: #333; }
+    .small { font-size: 12px; color: #666; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Pill Tracker — Morning & Night</h1>
+
+    <div class="pill" id="morning">
+      <h2 class="pill-name">🌅 Morning Pill</h2>
+      <p class="status">Checking status…</p>
+      <div>
+        <button class="take">I took it</button>
+        <button class="undo" style="display:none">Undo</button>
+        <button class="rename">Rename</button>
+      </div>
+    </div>
+
+    <div class="pill" id="night">
+      <h2 class="pill-name">🌙 Night Pill</h2>
+      <p class="status">Checking status…</p>
+      <div>
+        <button class="take">I took it</button>
+        <button class="undo" style="display:none">Undo</button>
+        <button class="rename">Rename</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getTodayDate() {
+      return new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    }
+
+    function initPill(id, defaultLabel, emoji) {
+      const root = document.getElementById(id);
+      const nameEl = root.querySelector(".pill-name");
+      const statusEl = root.querySelector(".status");
+      const takeBtn = root.querySelector(".take");
+      const undoBtn = root.querySelector(".undo");
+      const renameBtn = root.querySelector(".rename");
+
+      const nameKey = `pill_name_${id}`;
+      const dateKey = `pill_taken_${id}`;
+
+      function getLabel() {
+        return localStorage.getItem(nameKey) || defaultLabel;
+      }
+
+      function isTakenToday() {
+        const storedDate = localStorage.getItem(dateKey);
+        return storedDate === getTodayDate();
+      }
+
+      function updateStatus() {
+        const label = getLabel();
+        nameEl.textContent = `${emoji} ${label}`;
+
+        if (isTakenToday()) {
+          statusEl.textContent = `You have taken your ${label.toLowerCase()} pill today.`;
+          takeBtn.style.display = "none";
+          undoBtn.style.display = "";
+        } else {
+          statusEl.textContent = `You haven't taken your ${label.toLowerCase()} pill today.`;
+          takeBtn.style.display = "";
+          undoBtn.style.display = "none";
+        }
+      }
+
+      takeBtn.onclick = () => {
+        localStorage.setItem(dateKey, getTodayDate());
+        updateStatus();
+      };
+
+      undoBtn.onclick = () => {
+        localStorage.removeItem(dateKey);
+        updateStatus();
+      };
+
+      renameBtn.onclick = () => {
+        const newName = prompt("Enter a new name for this pill:", getLabel());
+        if (newName && newName.trim()) {
+          localStorage.setItem(nameKey, newName.trim());
+          updateStatus();
+        }
+      };
+
+      updateStatus();
+    }
+
+    initPill("morning", "Morning", "🌅");
+    initPill("night", "Night", "🌙");
+  </script>
+</body>
+</html>
