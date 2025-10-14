@@ -1,2 +1,2 @@
 # SimplePillTracker
-Tracks if you’ve taken your pills for Morning and Night using LocalStorage. Resets every morning at 12AM.
+Tracks if you’ve taken your pills for <b>Morning</b> and <b>Night</b> using <b>LocalStorage</b>. Resets every <b>morning</b> at <b>12 A.M.</b>
